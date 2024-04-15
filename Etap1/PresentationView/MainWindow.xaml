@@ -1,0 +1,47 @@
+﻿<Window x:Class="PresentationView.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:PresentationViewModel;assembly=PresentationViewModel"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="719" Width="1000">
+    <Window.DataContext>
+        <vm:ViewModelAPI/>
+    </Window.DataContext>
+    <StackPanel>
+        <Grid Height="700" Width="1000" Background="#FFEAE8E8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="137*" ></RowDefinition>
+                <RowDefinition Height="38*" ></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Button Name="StartButton" Content="Start" Height="30" Width="100" Margin="450,62,450,60" Grid.Row="1" Background="#FFBBBBBB" IsEnabled="{Binding IsStartEnabled}" Command="{Binding OnClickStartButton}" />
+            <Button Name="StopButton" Content="Stop" Height="30" Width="100" Margin="450,97,450,25" Grid.Row="1" Background="#FFBBBBBB" IsEnabled="{Binding IsStopEnabled}" Command="{Binding OnClickStopButton}" />
+            <TextBox IsEnabled="{Binding IsStartEnabled}" Text="{Binding InputNumber}" TextAlignment="Center" Height="30" Width="100" Margin="450,24,450,98" RenderTransformOrigin="0.495,0.858" Grid.Row="1"/>
+            <TextBlock Text="Podaj ilość kul" Height="30" Margin="440,544,440,126" TextAlignment="Center" FontSize="16" Grid.RowSpan="2"/>
+            <Grid Width="500" Height="500" Grid.Row="0" Background="#FFEAE8E8">
+                <Border  BorderBrush="Black" Background="#FFDACFBB" BorderThickness="0.5">
+                    <ItemsControl ItemsSource="{Binding ballList}" Height="500" Margin="0,0,0,0" Width="500">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Ellipse Width= "{Binding Diameter}" Height="{Binding Diameter}" Fill="Blue" Stroke="Black" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Top" Value="{Binding X}" />
+                                <Setter Property="Canvas.Left" Value="{Binding Y}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ItemsControl>
+                </Border>
+            </Grid>
+        </Grid>
+    </StackPanel>
+</Window>
