@@ -20,9 +20,9 @@
             <Button Name="StopButton" Content="Stop" Height="30" Width="100" Margin="450,97,450,25" Grid.Row="1" Background="#FFBBBBBB" IsEnabled="{Binding IsStopEnabled}" Command="{Binding OnClickStopButton}" />
             <TextBox IsEnabled="{Binding IsStartEnabled}" Text="{Binding InputNumber}" TextAlignment="Center" Height="30" Width="100" Margin="450,24,450,98" RenderTransformOrigin="0.495,0.858" Grid.Row="1"/>
             <TextBlock Text="Podaj ilość kul" Height="30" Margin="440,544,440,126" TextAlignment="Center" FontSize="16" Grid.RowSpan="2"/>
-            <Grid Width="500" Height="500" Grid.Row="0" Background="#FFEAE8E8">
+            <Grid Width="{Binding Width}" Height="{Binding Height}" Grid.Row="0" Background="#FFEAE8E8">
                 <Border  BorderBrush="Black" Background="#FFDACFBB" BorderThickness="0.5">
-                    <ItemsControl ItemsSource="{Binding ballList}" Height="500" Margin="0,0,0,0" Width="500">
+                    <ItemsControl ItemsSource="{Binding Balls}" Height="{Binding Height}" Margin="0,0,0,0" Width="{Binding Width}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <Canvas/>
@@ -30,13 +30,13 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Ellipse Width= "{Binding Diameter}" Height="{Binding Diameter}" Fill="Blue" Stroke="Black" />
+                                <Ellipse Width= "{Binding Diameter}" Height="{Binding Diameter}" Fill="LightPink" Stroke="Pink" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                         <ItemsControl.ItemContainerStyle>
                             <Style TargetType="ContentPresenter">
-                                <Setter Property="Canvas.Top" Value="{Binding X}" />
-                                <Setter Property="Canvas.Left" Value="{Binding Y}" />
+                                <Setter Property="Canvas.Top" Value="{Binding Left}" />
+                                <Setter Property="Canvas.Left" Value="{Binding Top}" />
                             </Style>
                         </ItemsControl.ItemContainerStyle>
                     </ItemsControl>

@@ -1,20 +1,21 @@
-﻿using PresentationModel;
+﻿using Data;
+using PresentationModel;
 using PresentationViewModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-
 namespace PresentationViewModel
 {
     public class ViewModelAPI : INotifyPropertyChanged
     {
+        public int Width { get; } = 500;
+        public int Height { get; } = 500;
+        private bool _isStartEnabled { get; set; } = true;
 
-        public bool isStartEnabled { get; set; } = true;
+        private bool _isStopEnabled { get; set; } = false;
 
-        public bool isStopEnabled { get; set; } = false;
-
-        public string inputNumber = "10";
+        private string _inputNumber = "3";
 
         public ICommand OnClickStartButton { get; set; }
 
@@ -22,27 +23,27 @@ namespace PresentationViewModel
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public ObservableCollection<BallModel> ballList { get; set; } = new ObservableCollection<BallModel>();
+        public ObservableCollection<BallModel> Balls { get; }
 
-        private ModelAbstractAPI modelAPI;
+        private ModelAbstractAPI _modelAPI;
 
         public bool IsStartEnabled
         {
-            get { return isStartEnabled; }
+            get { return _isStartEnabled; }
             set
             {
-                isStartEnabled = value;
-                OnPropertyChanged(nameof(isStartEnabled));
+                _isStartEnabled = value;
+                OnPropertyChanged();
             }
         }
 
         public bool IsStopEnabled
         {
-            get { return isStopEnabled; }
+            get { return _isStopEnabled; }
             set
             {
-                isStopEnabled = value;
-                OnPropertyChanged(nameof(isStopEnabled));
+                _isStopEnabled = value;
+                OnPropertyChanged();
             }
         }
 
@@ -50,13 +51,14 @@ namespace PresentationViewModel
         {
             OnClickStartButton = new RelayCommand(() => StartButtonHandle());
             OnClickStopButton = new RelayCommand(() => StopButtonHandle());
-            modelAPI = ModelAbstractAPI.CreateApi();
+            _modelAPI = ModelAbstractAPI.CreateApi(Width, Height);
+            Balls = _modelAPI.Balls;
         }
 
         public void StopButtonHandle()
         {
-            modelAPI.Stop();
-            ballList.Clear();
+            _modelAPI.Stop();
+            Balls.Clear();
             this.IsStartEnabled = true;
             this.IsStopEnabled = false;
 
@@ -69,34 +71,25 @@ namespace PresentationViewModel
             {
                 this.IsStartEnabled = false;
                 this.IsStopEnabled = true;
-                modelAPI.AddBalls(value);
-                modelAPI.AddModelBalls();
-                foreach (BallModel ball in modelAPI.BallModels)
-                {
-                    ballList.Add(ball);
-
-                }
-                OnPropertyChanged(nameof(ballList));
-                modelAPI.Start();
+                _modelAPI.AddBalls(value);
             }
 
         }
 
         public string InputNumber
         {
-            get { return inputNumber; }
+            get { return _inputNumber; }
             set
             {
-                inputNumber = value;
-                OnPropertyChanged(nameof(InputNumber));
+                _inputNumber = value;
+                OnPropertyChanged();
             }
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName =  null)
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
 
         public int getInputValue()
         {
