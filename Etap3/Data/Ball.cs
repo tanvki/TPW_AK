@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data
 {
@@ -21,6 +14,8 @@ namespace Data
 
         private Stopwatch _stopwatch;
 
+        private int _mass;
+
         public Ball(float x, float y, int mass, Vector2 velocity, int diameter, int id)
         {
             _stopwatch = new Stopwatch();
@@ -28,13 +23,25 @@ namespace Data
             _position = new Vector2(x, y);
             _velocity = velocity;
             _diameter = diameter;
-            Mass = mass;
+            _mass = mass;
+            task = Task.Run(Move);
+        }
+
+        public Ball(Ball other)
+        {
+            _stopwatch = new Stopwatch();
+            Id = other.Id;
+            _position = new Vector2(other.Position.X, other.Position.Y);
+            _velocity = other.Velocity;
+            _diameter = other.Diameter;
+            _mass = other.Mass;
             task = Task.Run(Move);
         }
 
         public event EventHandler? BallChanged;
 
         private Vector2 _position;
+
 
         public Vector2 Position
         {
@@ -64,33 +71,33 @@ namespace Data
             get => _diameter;
         }
 
-        public float X => _position.X;
-
-        public float Y => _position.Y;
-
-        public int Mass { get; }
+        public int Mass
+        {
+            get => _mass;
+            private set { _mass = value; }
+        }
 
 
         public int Id { get; }
 
         private async void Move()
         {
-            int delay = 15;
+            float time;
 
             while (_move)
             {
                 _stopwatch.Restart();
                 _stopwatch.Start();
-
-                Update(delay);
+                time = (2 / _velocity.Length());
+                Update(time);
 
                 _stopwatch.Stop();
-                await Task.Delay(delay - (int)_stopwatch.ElapsedMilliseconds < 0 ? 0 : delay - (int)_stopwatch.ElapsedMilliseconds);
+                await Task.Delay(time - _stopwatch.ElapsedMilliseconds < 0 ? 0 : (int)(time - _stopwatch.ElapsedMilliseconds));
             }
 
         }
 
-        private void Update(long time)
+        private void Update(float time)
         {
             Position += _velocity * time;
             BallChanged?.Invoke(this, EventArgs.Empty);
@@ -99,7 +106,11 @@ namespace Data
         public void Dispose()
         {
             _move = false;
+            task.Wait();
             task.Dispose();
         }
+
+
     }
+
 }

@@ -2,8 +2,6 @@
 
 using Data;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Numerics;
 
 namespace Logic
@@ -91,7 +89,7 @@ namespace Logic
                     DetectBallCollision(ball);
                 }
                 DetectWallCollision(ball);
-                LogicLayerEvent?.Invoke(this, (ball.Id, ball.X, ball.Y, ball.Diameter));
+                LogicLayerEvent?.Invoke(this, (ball.Id, ball.Position.X, ball.Position.Y, ball.Diameter));
             }
 
 
@@ -187,7 +185,7 @@ namespace Logic
             private void DetectWallCollision(IBall ball)
             {
 
-                Vector2 newVel = new Vector2(ball.Velocity.X, ball.Velocity.Y);
+                Vector2 newVel = ball.Velocity;
                 int Radius = ball.Diameter / 2;
                 if (ball.Position.X - Radius <= 0)
                 {
@@ -208,7 +206,6 @@ namespace Logic
                     newVel.Y = -Math.Abs(ball.Velocity.Y);
 
                 }
-
                 ball.Velocity = newVel;
             }
 

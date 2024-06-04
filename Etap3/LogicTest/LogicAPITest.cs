@@ -1,6 +1,6 @@
 using Data;
-using System.Numerics;
 using Logic;
+using System.Numerics;
 
 
 namespace LogicTest
