@@ -1,23 +1,24 @@
-﻿using System.Collections.Concurrent;
+﻿﻿using System.Collections.Concurrent;
 using System.Text.Json;
-
 
 namespace Data
 {
     internal class DAO : IDisposable
     {
-        private Task loggingTask;
+        private Timer loggingTimer;
+        private object lockObject = new object();
         private StreamWriter writer;
         private BlockingCollection<BallData> writingQueue;
         private string filePath = "../../../../Dane/log.txt";
         private int Width;
         private int Height;
+
         public DAO(int width, int height)
         {
             this.Width = width;
             this.Height = height;
             writingQueue = new BlockingCollection<BallData>();
-            loggingTask = Task.Run(writeToFile);
+            loggingTimer = new Timer(writeToFile, null, 0, 500);
         }
 
 
@@ -44,35 +45,33 @@ namespace Data
 
         }
 
-        private void writeToFile()
+        public void writeToFile(object state)
         {
-            using (writer = new StreamWriter(filePath, append: false))
+            lock (lockObject)
             {
-                JsonSerializerOptions options = new JsonSerializerOptions();
-                options.WriteIndented = true;
-                writer.Write("[\n");
-                writer.Write("{" + string.Format("\n\t\"Width\": {0},\n\t\"Height\": {1}\n", Width, Height) + "}");
-                foreach (BallData ball in writingQueue.GetConsumingEnumerable())
+                using (writer = new StreamWriter(filePath, append: true))
                 {
-                    string log = JsonSerializer.Serialize(ball, options);
+                    JsonSerializerOptions options = new JsonSerializerOptions();
+                    options.WriteIndented = true;
+                    writer.Write("[\n");
+                    writer.Write("{" + string.Format("\n\t\"Width\": {0},\n\t\"Height\": {1}\n", Width, Height) + "}");
+                    foreach (BallData ball in writingQueue.GetConsumingEnumerable())
+                    {
+                        string log = JsonSerializer.Serialize(ball, options);
 
-                    writer.Write("," + "\n" + log);
+                        writer.Write("," + "\n" + log);
 
+                    }
+                    writer.Write("\n]");
+                    writer.Flush();
                 }
-                writer.Write("\n]");
-                writer.Flush();
             }
-
-
-
-
         }
 
         public void Dispose()
         {
             writingQueue.CompleteAdding();
-            loggingTask.Wait();
-            loggingTask.Dispose();
+            loggingTimer.Dispose();
         }
 
         internal class BallData
